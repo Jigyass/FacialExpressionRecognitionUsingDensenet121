@@ -1,5 +1,4 @@
 import tensorflow as tf
-import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing import image_dataset_from_directory
 from tensorflow.keras.applications import DenseNet121
 from tensorflow.keras.layers import Input
@@ -25,20 +24,7 @@ def prepare_dataset(directory, batch_size=32):
     dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
     return dataset
 
-def show_batch(image_batch, label_batch):
-    plt.figure(figsize=(10,10))
-    for n in range(min(len(image_batch), 25)):
-        ax = plt.subplot(5,5,n+1)
-        plt.imshow(image_batch[n])
-        plt.title(label_batch[n].numpy())
-        plt.axis('off')
-    plt.show()
-
 def prepare_datasets(directory, batch_size=100, train_val_split=0.8):
-    total_files = len(tf.io.gfile.glob(directory + '/*/*.jpg'))
-    train_size = int(train_val_split * total_files)
-    val_size = total_files - train_size
-    
     dataset = image_dataset_from_directory(
         directory,
         validation_split=1-train_val_split,
@@ -83,10 +69,6 @@ def build_model(num_classes):
 if __name__ == "__main__":
     train_directory = '/home/jigyas/Github/FacialExpressionRecognitionUsingDensenet121/project_1_dataset/train'
     train_dataset = prepare_dataset(train_directory)
-
-    for images, labels in train_dataset.take(1):
-        show_batch(images, labels)
-
     model = build_model(7)
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     train_dataset, validation_dataset = prepare_datasets(train_directory)
